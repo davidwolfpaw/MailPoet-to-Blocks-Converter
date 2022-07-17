@@ -8,8 +8,8 @@
  * Requires PHP:      7.1.0
  * Author:            david wolfpaw
  * Author URI:        https://davidwolfpaw.com
- * License:           GPL v2 or later
- * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+ * License:           GPL v3 or later
+ * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:       mailpoet-to-blocks
  * Domain Path:       /languages
  */
