@@ -16,12 +16,6 @@
 
 require_once dirname( __FILE__ ). '/inc/functions.php';
 require_once dirname( __FILE__ ). '/inc/hooks.php';
-/**
-* Setup plugin updater
-*/
-add_action( 'plugins_loaded', function(){
-	require_once dirname( __FILE__ ). '/inc/MailPoetToBlocksConverterUpdater.php';
-	new \MailPoetToBlocksConverterUpdater( '0.0.1', plugin_basename( __DIR__ ), plugin_basename( __FILE__ ) );
-});
+require_once dirname( __FILE__ ). '/inc/block-exporter.php';
 
 require_once dirname( __FILE__ ) . '/admin/mailpoet-to-block-converter/init.php';

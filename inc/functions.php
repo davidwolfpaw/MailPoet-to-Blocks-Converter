@@ -62,7 +62,7 @@ function get_single_newsletter( int $newsletter_id = 0 ) {
  * @return array $newsletter_blocks an array of the content of a newsletter body
  */
 function get_newsletter_blocks() {
-	$newsletter = get_single_newsletter( 20 );
+	$newsletter = get_single_newsletter( 67 );
 	$newsletter_body = json_decode( $newsletter->body, true );
 	$newsletter_blocks = $newsletter_body['content'];
 	return $newsletter_blocks;
