@@ -7,7 +7,7 @@
 function display_results() {
 	$results = '';
 	$results = get_newsletter_body();
-	var_dump( $results );
+	// var_dump( $results );
 }
 
 /**
@@ -85,8 +85,6 @@ function get_newsletter_body() {
  * @return void
  */
 function newsletter_blocks_loop( array $array, int $depth = 0 ) {
-	$blocks_html = '';
-
 	// Loop each row of array
 	foreach ( $array as $key => $value ) {
 		// If we've got a blocks array, transform it!
