@@ -7,6 +7,7 @@
 function display_results() {
 	$results = '';
 	$results = get_newsletter_body();
+	var_dump( $results );
 }
 
 /**
@@ -70,16 +71,10 @@ function get_newsletter_blocks() {
 
 /**
  * Extract the body of a newsletter to manipulate
- *
- * @return array $newsletter_body the modified body of a newsletter object
  */
 function get_newsletter_body() {
 	$newsletter_blocks = get_newsletter_blocks();
-	$newsletter_body = array();
-
 	$newsletter_body = newsletter_blocks_loop( $newsletter_blocks );
-
-	return $newsletter_body;
 }
 
 /**
@@ -90,14 +85,17 @@ function get_newsletter_body() {
  * @return void
  */
 function newsletter_blocks_loop( array $array, int $depth = 0 ) {
-	// loop each row of array
+	$blocks_html = '';
+
+	// Loop each row of array
 	foreach ( $array as $key => $value ) {
+		// If we've got a blocks array, transform it!
 		if ( is_array( $value ) && 'blocks' === $key ) {
 			foreach ( $value as $block ) {
 				transform_block( $block );
-				// echo $block["type"] . "<br>";
 			}
 		}
+		// Recurse through until a blocks array is found or no arrays are left
 		if ( is_array( $value ) && 'blocks' !== $key ) {
 			newsletter_blocks_loop( $value, $depth + 1 );
 		}
@@ -105,9 +103,10 @@ function newsletter_blocks_loop( array $array, int $depth = 0 ) {
 }
 
 /**
- * Undocumented function
+ * Sorts the arrays to send to the proper function to create blocks
+ * TODO: Make blocks from containers to wrap other blocks
  *
- * @param [type] $block
+ * @param array $block
  * @return void
  */
 function transform_block( $block ) {
@@ -140,7 +139,7 @@ function transform_block( $block ) {
 function create_block_text( $block ) {
 	$html = $block['text'];
 
-	echo $html;
+	return $html;
 }
 
 /**
@@ -155,7 +154,7 @@ function create_block_image( $block ) {
 	$image_alt       = isset( $block['alt'] ) ? $block['alt'] : '';
 	$image_fullWidth = isset( $block['fullWidth'] ) ? $block['fullWidth'] : false;
 	$image_width     = isset( $block['width'] ) ? $block['width'] : '';
-	// height is not set by MailPoet, so we'll be using auto for it
+	// height is not set by MailPoet, so we'll be using auto for height value
 	$image_height    = isset( $block['height'] ) ? $block['height'] : '';
 	$image_align     = isset( $block['styles']['block']['textAlign'] ) ? $block['styles']['block']['textAlign'] : 'center';
 
@@ -194,7 +193,7 @@ function create_block_image( $block ) {
 		$html .= '<!-- /wp:image -->';
 	}
 
-	echo $html;
+	return $html;
 }
 
 /**
@@ -211,7 +210,7 @@ function create_block_spacer( $block ) {
 	$html .= '<div style="height:' . $spacer_height . '" aria-hidden="true" class="wp-block-spacer"></div>';
 	$html .= '<!-- /wp:spacer -->';
 
-	echo $html;
+	return $html;
 }
 
 /**
@@ -236,7 +235,7 @@ function create_block_separator( $block ) {
 		$html .= '<!-- /wp:separator -->';
 	}
 	
-	echo $html;
+	return $html;
 }
 
 /**
@@ -254,5 +253,5 @@ function create_block_footer( $block ) {
 	$footer_linkColor       = isset( $block['styles']['link']['fontColor'] ) ? $block['styles']['link']['fontColor'] : 'inherit';
 	$footer_textDecoration  = isset( $block['styles']['link']['textDecoration'] ) ? $block['styles']['link']['textDecoration'] : 'inherit';
 
-	echo $html;
+	return $html;
 }
