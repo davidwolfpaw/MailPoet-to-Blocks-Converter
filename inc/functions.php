@@ -38,6 +38,7 @@ function get_mailpoet_newsletters_count() {
 				"SELECT count(ID) as total FROM {$wpdb->prefix}mailpoet_newsletters"
 			) 
 		);
+		$count = $count[0]->total;
 		return $count;
 	}
 }
