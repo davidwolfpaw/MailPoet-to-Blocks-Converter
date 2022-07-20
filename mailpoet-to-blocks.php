@@ -18,4 +18,4 @@ require_once dirname( __FILE__ ). '/inc/functions.php';
 require_once dirname( __FILE__ ). '/inc/hooks.php';
 require_once dirname( __FILE__ ). '/inc/block-exporter.php';
 
-require_once dirname( __FILE__ ) . '/admin/mailpoet-to-block-converter/init.php';
+require_once dirname( __FILE__ ) . '/admin/mailpoet-to-block-converter/mailpoet-to-blocks-converter-admin.php';
