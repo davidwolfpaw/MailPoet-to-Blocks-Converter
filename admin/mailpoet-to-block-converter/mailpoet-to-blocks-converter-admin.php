@@ -58,7 +58,7 @@ class Mailpoet_to_Blocks_Converter_Admin {
 				?>
 			</p>
 
-			<form method="post" action="options.php">
+			<form method="post" action="tools.php">
 				<?php
 
 				settings_fields( 'mailpoet_to_blocks_general_settings' );
@@ -68,6 +68,7 @@ class Mailpoet_to_Blocks_Converter_Admin {
 
 				?>
 			</form>
+			<?php display_results(); ?>
 
 		</div><!-- /.wrap -->
 		<?php
@@ -85,6 +86,19 @@ class Mailpoet_to_Blocks_Converter_Admin {
 			__( 'General Settings', 'mailpoet-to-blocks' ),
 			'',
 			'mailpoet_to_blocks_general_settings'
+		);
+
+		add_settings_field(
+			'termstext',
+			__( 'Text', 'mailpoet-to-blocks' ),
+			array( $this, 'text_input_callback' ),
+			'mailpoet_to_blocks_general_settings',
+			'general_settings_section',
+			array(
+				'label_for'    => 'termstext',
+				'option_group' => 'mailpoet_to_blocks_settings',
+				'option_id'    => 'termstext',
+			)
 		);
 
 		register_setting(

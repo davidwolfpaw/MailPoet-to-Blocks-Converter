@@ -1,13 +1,17 @@
 <?php
+// Global variable to build a post from blocks
+$build_content = '';
+
 /**
  * A test function to show me some output for debugging
  *
  * @return void
  */
 function display_results() {
+	global $build_content;
 	$results = '';
 	$results = get_newsletter_body();
-	// var_dump( $results );
+	var_dump( $build_content );
 }
 
 /**
@@ -138,6 +142,9 @@ function transform_block( $block ) {
 function create_block_text( $block ) {
 	$html = $block['text'];
 
+	global $build_content;
+	$build_content .= $html;
+
 	return $html;
 }
 
@@ -192,6 +199,9 @@ function create_block_image( $block ) {
 		$html .= '<!-- /wp:image -->';
 	}
 
+	global $build_content;
+	$build_content .= $html;
+
 	return $html;
 }
 
@@ -208,6 +218,9 @@ function create_block_spacer( $block ) {
 	$html .= '<!-- wp:spacer {"height":"' . $spacer_height . '"} -->';
 	$html .= '<div style="height:' . $spacer_height . '" aria-hidden="true" class="wp-block-spacer"></div>';
 	$html .= '<!-- /wp:spacer -->';
+
+	global $build_content;
+	$build_content .= $html;
 
 	return $html;
 }
@@ -233,6 +246,9 @@ function create_block_separator( $block ) {
 		$html .= '<hr class="wp-block-separator has-css-opacity style="background-color:' . $divider_backgroundColor . ';color:' . $divider_backgroundColor . '"/>';
 		$html .= '<!-- /wp:separator -->';
 	}
+
+	global $build_content;
+	$build_content .= $html;
 	
 	return $html;
 }
@@ -251,6 +267,9 @@ function create_block_footer( $block ) {
 	$footer_textAlign       = isset( $block['styles']['text']['textAlign'] ) ? $block['styles']['text']['textAlign'] : 'left';
 	$footer_linkColor       = isset( $block['styles']['link']['fontColor'] ) ? $block['styles']['link']['fontColor'] : 'inherit';
 	$footer_textDecoration  = isset( $block['styles']['link']['textDecoration'] ) ? $block['styles']['link']['textDecoration'] : 'inherit';
+
+	global $build_content;
+	$build_content .= $html;
 
 	return $html;
 }
