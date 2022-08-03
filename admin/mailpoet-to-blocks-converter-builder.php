@@ -28,7 +28,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 	public function display_results() {
 		global $build_content;
 		$results = '';
-		$results = get_newsletter_body();
+		$results = $this->get_newsletter_body();
 		var_dump( $build_content );
 	}
 
@@ -54,7 +54,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 	 */
 	public function get_mailpoet_newsletters_count() {
 		global $wpdb;
-		if (true === check_mailpoet_newsletters_table() ) {
+		if ( true === $this->check_mailpoet_newsletters_table() ) {
 			$count = $wpdb->get_results( 
 				$wpdb->prepare(
 					"SELECT count(ID) as total FROM {$wpdb->prefix}mailpoet_newsletters"
@@ -73,7 +73,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 	 */
 	public function get_single_newsletter( int $newsletter_id = 0 ) {
 		global $wpdb;
-		if (true === check_mailpoet_newsletters_table() ) {
+		if ( true === $this->check_mailpoet_newsletters_table() ) {
 			$newsletter = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}mailpoet_newsletters WHERE id = %d", $newsletter_id));
 			return $newsletter;
 		}
@@ -86,7 +86,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 	 * @return array $newsletter_blocks an array of the content of a newsletter body
 	 */
 	public function get_newsletter_blocks() {
-		$newsletter = get_single_newsletter( 67 );
+		$newsletter = $this->get_single_newsletter( 67 );
 		$newsletter_body = json_decode( $newsletter->body, true );
 		$newsletter_blocks = $newsletter_body['content'];
 		return $newsletter_blocks;
@@ -96,8 +96,8 @@ class MailPoet_to_Blocks_Converter_Builder {
 	 * Extract the body of a newsletter to manipulate
 	 */
 	public function get_newsletter_body() {
-		$newsletter_blocks = get_newsletter_blocks();
-		$newsletter_body = newsletter_blocks_loop( $newsletter_blocks );
+		$newsletter_blocks = $this->get_newsletter_blocks();
+		$newsletter_body = $this->newsletter_blocks_loop( $newsletter_blocks );
 	}
 
 	/**
@@ -113,12 +113,12 @@ class MailPoet_to_Blocks_Converter_Builder {
 			// If we've got a blocks array, transform it!
 			if ( is_array( $value ) && 'blocks' === $key ) {
 				foreach ( $value as $block ) {
-					transform_block( $block );
+					$this->transform_block( $block );
 				}
 			}
 			// Recurse through until a blocks array is found or no arrays are left
 			if ( is_array( $value ) && 'blocks' !== $key ) {
-				newsletter_blocks_loop( $value, $depth + 1 );
+				$this->newsletter_blocks_loop( $value, $depth + 1 );
 			}
 		}
 	}
@@ -132,22 +132,22 @@ class MailPoet_to_Blocks_Converter_Builder {
 	 */
 	public function transform_block( $block ) {
 		if ( "container" === $block["type"] ) {
-			newsletter_blocks_loop( $block );
+			$this->newsletter_blocks_loop( $block );
 		}
 		if ( "text" === $block["type"] ) {
-			create_block_text( $block );
+			$this->create_block_text( $block );
 		}
 		if ( "image" === $block["type"] ) {
-			create_block_image( $block );
+			$this->create_block_image( $block );
 		}
 		if ( "spacer" === $block["type"] ) {
-			create_block_spacer( $block );
+			$this->create_block_spacer( $block );
 		}
 		if ( "divider" === $block["type"] ) {
-			create_block_separator( $block );
+			$this->create_block_separator( $block );
 		}
 		if ( "footer" === $block["type"] ) {
-			create_block_footer( $block );
+			$this->create_block_footer( $block );
 		}
 	}
 

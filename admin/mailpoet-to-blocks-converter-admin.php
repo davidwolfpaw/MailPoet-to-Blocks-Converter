@@ -54,7 +54,8 @@ class MailPoet_to_Blocks_Converter_Admin {
 			</p>
 			<p>
 				<?php
-				$newsletter_count = get_mailpoet_newsletters_count();
+				$builder = new MailPoet_to_Blocks_Converter_Builder();
+				$newsletter_count = $builder->get_mailpoet_newsletters_count();
 				printf( __( 'You have <strong>%d</strong> newsletters in MailPoet, ready to convert.', 'mailpoet-to-blocks' ), $newsletter_count  );
 				?>
 			</p>
@@ -69,7 +70,7 @@ class MailPoet_to_Blocks_Converter_Admin {
 
 				?>
 			</form>
-			<?php display_results(); ?>
+			<?php $builder->display_results(); ?>
 
 		</div><!-- /.wrap -->
 		<?php
