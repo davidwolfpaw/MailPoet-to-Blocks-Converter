@@ -1,8 +1,9 @@
 <?php
 /**
- * @package Creative Commons Post Republisher
+ * Handles admin functions for the plugin
+ * @package MailPoet to Blocks Converter
  */
-class Mailpoet_to_Blocks_Converter_Admin {
+class MailPoet_to_Blocks_Converter_Admin {
 
 	public function __construct() {
 
@@ -166,4 +167,4 @@ class Mailpoet_to_Blocks_Converter_Admin {
 
 
 }
-new Mailpoet_to_Blocks_Converter_Admin();
+new MailPoet_to_Blocks_Converter_Admin();
