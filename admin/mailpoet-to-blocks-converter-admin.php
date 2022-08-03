@@ -103,6 +103,19 @@ class MailPoet_to_Blocks_Converter_Admin {
 			)
 		);
 
+		add_settings_field(
+			'convert_post_type',
+			__( 'Post Type', 'mailpoet-to-blocks' ),
+			array( $this, 'post_type_select_callback' ),
+			'mailpoet_to_blocks_general_settings',
+			'general_settings_section',
+			array(
+				'label_for'    => 'convert_post_type',
+				'option_group' => 'mailpoet_to_blocks_settings',
+				'option_id'    => 'convert_post_type',
+			)
+		);
+
 		register_setting(
 			'mailpoet_to_blocks_general_settings',
 			'mailpoet_to_blocks_settings'
@@ -111,7 +124,38 @@ class MailPoet_to_Blocks_Converter_Admin {
 	}
 
 	/**
-	 * Input Callbacks
+	 * Post Type Select Input Callback
+	 */
+	public function post_type_select_callback( $post_type_select ) {
+
+		// Get arguments from setting
+		$option_group = $post_type_select['option_group'];
+		$option_id    = $post_type_select['option_id'];
+		$option_name  = "{$option_group}[{$option_id}]";
+
+		// Get existing option from database
+		$options      = get_option( $option_group );
+		$option_value = isset( $options[ $option_id ] ) ? $options[ $option_id ] : 'post';
+
+		// Get post types
+		$args = array(
+			'public' => true,
+		);
+		$post_types = get_post_types( $args, 'objects' );
+		
+		echo "<select id='{$option_id}' name='{$option_id}'>";
+			foreach ( $post_types as $post_type_obj ):
+				$labels = get_post_type_labels( $post_type_obj );
+				echo '<option value="' . esc_attr( $post_type_obj->name ) . '" ' . selected( $post_type_obj->name, $option_value ) . '>';
+					echo esc_attr( $post_type_obj->label);
+				echo '</option>';
+			endforeach;
+		echo '</select>';
+
+	}
+
+	/**
+	 * Text Input Callback
 	 */
 	public function text_input_callback( $text_input ) {
 
@@ -122,13 +166,16 @@ class MailPoet_to_Blocks_Converter_Admin {
 
 		// Get existing option from database
 		$options      = get_option( $option_group );
-		$option_value = isset( $options[ $option_id ] ) ? $options[ $option_id ] : '0';
+		$option_value = isset( $options[ $option_id ] ) ? $options[ $option_id ] : '';
 
 		// Render the output
 		echo "<input type='text' id='{$option_id}' name='{$option_name}' value='{$option_value}' />";
 
 	}
 
+	/**
+	 * Checkbox Input Callback
+	 */
 	public function checkbox_input_callback( $checkbox_input ) {
 
 		// Get arguments from setting
