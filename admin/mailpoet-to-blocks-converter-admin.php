@@ -92,19 +92,6 @@ class MailPoet_to_Blocks_Converter_Admin {
 			'mailpoet_to_blocks_general_settings'
 		);
 
-		// add_settings_field(
-		// 	'termstext',
-		// 	__( 'Text', 'mailpoet-to-blocks' ),
-		// 	array( $this, 'text_input_callback' ),
-		// 	'mailpoet_to_blocks_general_settings',
-		// 	'general_settings_section',
-		// 	array(
-		// 		'label_for'    => 'termstext',
-		// 		'option_group' => 'mailpoet_to_blocks_settings',
-		// 		'option_id'    => 'termstext',
-		// 	)
-		// );
-
 		add_settings_field(
 			'convert_post_type',
 			__( 'Post Type', 'mailpoet-to-blocks' ),
@@ -214,7 +201,6 @@ class MailPoet_to_Blocks_Converter_Admin {
 		// Return the array processing any additional functions filtered by this action
 		return apply_filters( 'validate_inputs', $output, $input );
 	}
-
 
 }
 new MailPoet_to_Blocks_Converter_Admin();
