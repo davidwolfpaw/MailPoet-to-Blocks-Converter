@@ -15,7 +15,7 @@
  */
 
 // require_once dirname( __FILE__ ). '/inc/functions.php';
-require_once dirname( __FILE__ ). '/inc/block-exporter.php';
+// require_once dirname( __FILE__ ). '/inc/block-exporter.php';
 
 require_once dirname( __FILE__ ) . '/admin/mailpoet-to-blocks-converter-admin.php';
 require_once dirname( __FILE__ ) . '/admin/mailpoet-to-blocks-converter-builder.php';

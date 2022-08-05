@@ -60,7 +60,7 @@ class MailPoet_to_Blocks_Converter_Admin {
 				?>
 			</p>
 
-			<form method="post" action="tools.php">
+			<form method="post" action="options.php">
 				<?php
 
 				settings_fields( 'mailpoet_to_blocks_general_settings' );
@@ -70,7 +70,9 @@ class MailPoet_to_Blocks_Converter_Admin {
 
 				?>
 			</form>
-			<?php $builder->display_results(); ?>
+			<?php
+			$builder->display_results();
+			?>
 
 		</div><!-- /.wrap -->
 		<?php
@@ -90,18 +92,18 @@ class MailPoet_to_Blocks_Converter_Admin {
 			'mailpoet_to_blocks_general_settings'
 		);
 
-		add_settings_field(
-			'termstext',
-			__( 'Text', 'mailpoet-to-blocks' ),
-			array( $this, 'text_input_callback' ),
-			'mailpoet_to_blocks_general_settings',
-			'general_settings_section',
-			array(
-				'label_for'    => 'termstext',
-				'option_group' => 'mailpoet_to_blocks_settings',
-				'option_id'    => 'termstext',
-			)
-		);
+		// add_settings_field(
+		// 	'termstext',
+		// 	__( 'Text', 'mailpoet-to-blocks' ),
+		// 	array( $this, 'text_input_callback' ),
+		// 	'mailpoet_to_blocks_general_settings',
+		// 	'general_settings_section',
+		// 	array(
+		// 		'label_for'    => 'termstext',
+		// 		'option_group' => 'mailpoet_to_blocks_settings',
+		// 		'option_id'    => 'termstext',
+		// 	)
+		// );
 
 		add_settings_field(
 			'convert_post_type',
@@ -143,10 +145,10 @@ class MailPoet_to_Blocks_Converter_Admin {
 		);
 		$post_types = get_post_types( $args, 'objects' );
 		
-		echo "<select id='{$option_id}' name='{$option_id}'>";
+		echo "<select id='{$option_id}' name='{$option_name}'>";
 			foreach ( $post_types as $post_type_obj ):
 				$labels = get_post_type_labels( $post_type_obj );
-				echo '<option value="' . esc_attr( $post_type_obj->name ) . '" ' . selected( $post_type_obj->name, $option_value ) . '>';
+				echo '<option value="' . esc_attr( $post_type_obj->name ) . '" ' . selected( $option_value, $post_type_obj->name, false ) . '>';
 					echo esc_attr( $post_type_obj->label);
 				echo '</option>';
 			endforeach;

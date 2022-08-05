@@ -13,11 +13,6 @@ class MailPoet_to_Blocks_Converter_Builder {
 		$this->plugin_name = 'mailpoet-to-blocks';
 		$this->version     = '0.0.1';
 
-		$this->build_content = $build_content;
-
-		// add_action( 'admin_menu', array( $this, 'setup_plugin_options_menu' ), 9 );
-		// add_action( 'admin_init', array( $this, 'initialize_general_settings' ) );
-
 	}
 
 	/**
@@ -28,8 +23,9 @@ class MailPoet_to_Blocks_Converter_Builder {
 	public function display_results() {
 		global $build_content;
 		$results = '';
-		$results = $this->get_newsletter_body();
-		var_dump( $build_content );
+		// $results = $this->create_newsletter_post(63);
+		// $results = $this->get_single_newsletter(63);
+		// var_dump($results);
 	}
 
 	/**
@@ -83,10 +79,11 @@ class MailPoet_to_Blocks_Converter_Builder {
 	 * Get the blocks of content from the object json
 	 * TODO: write functions to iterate over newsletter rows
 	 *
+	 * @param integer $newsletter_id a specific newsletter to pull
 	 * @return array $newsletter_blocks an array of the content of a newsletter body
 	 */
-	public function get_newsletter_blocks() {
-		$newsletter = $this->get_single_newsletter( 67 );
+	public function get_newsletter_blocks( int $post_id = 0 ) {
+		$newsletter = $this->get_single_newsletter( $post_id );
 		$newsletter_body = json_decode( $newsletter->body, true );
 		$newsletter_blocks = $newsletter_body['content'];
 		return $newsletter_blocks;
@@ -94,10 +91,13 @@ class MailPoet_to_Blocks_Converter_Builder {
 
 	/**
 	 * Extract the body of a newsletter to manipulate
+	 * @param integer $newsletter_id a specific newsletter to pull
+	 * @return array $newsletter_blocks an array of the content of a newsletter body
 	 */
-	public function get_newsletter_body() {
-		$newsletter_blocks = $this->get_newsletter_blocks();
+	public function get_newsletter_body( int $post_id = 0 ) {
+		$newsletter_blocks = $this->get_newsletter_blocks( $post_id );
 		$newsletter_body = $this->newsletter_blocks_loop( $newsletter_blocks );
+		return $newsletter_body;
 	}
 
 	/**
@@ -292,6 +292,88 @@ class MailPoet_to_Blocks_Converter_Builder {
 		return $html;
 	}
 
+	/**
+	 * Gets the post type that is set to convert newsletters into
+	 *
+	 * @return string $post_type The post type to convert to
+	 */
+	public function get_newsletter_post_type() {
+		$options = get_option('mailpoet_to_blocks_settings');
+		$post_type = $options['convert_post_type'];
+		return $post_type;
+	}
+
+	/**
+	 * Gets the ID of the newsletter author
+	 *
+	 * @param string $sender_address The email address of the newsletter sender
+	 * @return int $author_id The ID of the author of the newsletter or current user
+	 */
+	public function get_single_newsletter_author( string $sender_address = '' ) {
+		$author = get_user_by( 'email', $sender_address );
+
+		if ( false === $author || ! isset ( $author ) ) {
+			$author_id = get_current_user_id();
+		} else {
+			$author_id = $author->ID;
+		}
+
+		return $author_id;
+	}
+
+	/**
+	 * Convert MailPoet status to WordPress post status
+	 *
+	 * @param string $status The status of the newsletter object
+	 * @return string $newsletter_status The updated status to match WP post object
+	 */
+	public function get_newsletter_status( $status = '' ) {
+		if ( null === $status ) {
+			wp_die();
+		} elseif ( 'sent' === $status ) {
+			$newsletter_status = 'publish';
+		} elseif ( 'scheduled' === $status ) {
+			$newsletter_status = 'future';
+		} elseif ( 'draft' === $status ) {
+			$newsletter_status = 'draft';
+		}
+		return $newsletter_status;
+	}
+
+	/**
+	 * Creates a post from newsletter data and inserts it into the WP database
+	 *
+	 * @param integer $post_id the ID of the newsletter being inserted
+	 */
+	public function create_newsletter_post( int $post_id = 0 ) {
+
+		global $build_content;
+
+		$newsletter = $this->get_single_newsletter( $post_id );
+
+		$newsletter_post_type = $this->get_newsletter_post_type();
+		$newsletter_content   = $this->get_newsletter_body( $newsletter->id );
+		$newsletter_status    = $this->get_newsletter_status( $newsletter->status );
+		$newsletter_author    = $this->get_single_newsletter_author( $newsletter->sender_address );
+
+		// TODO: insert $post["id"] to track already inserted
+		$post_array = array(
+			'post_type'    => $newsletter_post_type,
+			'post_title'    => $newsletter->subject,
+			'post_content'  => $build_content,
+			'post_status'   => $newsletter_status,
+			'post_author'   => $newsletter_author,
+			'post_date'     => $newsletter->sent_at,
+			'meta_input'    => array(
+				'newsletter_preheader' => $newsletter->preheader,
+			),
+		);
+
+		// Insert the post into the database
+		// wp_insert_post( $post_array );
+		return $post_array;
+
+	}
 
 }
 new MailPoet_to_Blocks_Converter_Builder();
