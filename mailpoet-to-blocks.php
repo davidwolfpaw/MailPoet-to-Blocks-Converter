@@ -14,8 +14,14 @@
  * Domain Path:       /languages
  */
 
-// require_once dirname( __FILE__ ). '/inc/functions.php';
-// require_once dirname( __FILE__ ). '/inc/block-exporter.php';
+if ( ! class_exists( 'MailPoet_to_Blocks_Converter_Admin' ) ) {
+	require_once dirname( __FILE__ ) . '/admin/mailpoet-to-blocks-converter-admin.php';
+}
 
-require_once dirname( __FILE__ ) . '/admin/mailpoet-to-blocks-converter-admin.php';
-require_once dirname( __FILE__ ) . '/admin/mailpoet-to-blocks-converter-builder.php';
+if ( ! class_exists( 'MailPoet_to_Blocks_Converter_Builder' ) ) {
+	require_once dirname( __FILE__ ) . '/admin/mailpoet-to-blocks-converter-builder.php';
+}
+
+if ( ! class_exists( 'WP_Async_Task' ) ) {
+	require_once dirname( __FILE__ ) . '/admin/class-wp-async-task.php';
+}

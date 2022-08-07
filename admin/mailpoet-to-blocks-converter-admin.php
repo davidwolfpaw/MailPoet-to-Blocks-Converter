@@ -13,6 +13,49 @@ class MailPoet_to_Blocks_Converter_Admin {
 		add_action( 'admin_menu', array( $this, 'setup_plugin_options_menu' ), 9 );
 		add_action( 'admin_init', array( $this, 'initialize_general_settings' ) );
 
+		add_action( 'wp_ajax_convert_newsletters_to_blocks', array( $this, 'convert_newsletters_to_blocks' ) );
+		
+	}
+
+	/**
+	 * Enqueue admin scripts.
+	 *
+	 * @return void
+	 */
+	public function enqueue_scripts() {
+		wp_enqueue_script( 'mailpoet-to-blocks-admin', esc_url( plugin_dir_url( __DIR__ ) . 'assets/admin.js' ), array( 'jquery' ), $this->version );
+
+		$l10n = array(
+			'convert_nonce' => wp_create_nonce( 'convert_newsletters_to_blocks' ),
+			'ajaxurl'       => admin_url( 'admin-ajax.php' ),
+			'convert_error' => __( 'There was an error converting the MailPoet newsletters.', 'mailpoet-to-blocks' ),
+			'converting'    => __( 'Converting Newsletters', 'mailpoet-to-blocks' ),
+		);
+
+		wp_localize_script( 'mailpoet-to-blocks-admin', 'mailpoet_to_blocks_admin_config', $l10n );
+	}
+
+	/**
+	 * Convert Newsletters to Blocks
+	 *
+	 * @return void
+	 */
+	public function convert_newsletters_to_blocks() {
+
+		// check nonce
+		$nonce = $_POST['convert_nonce'];
+		if ( ! wp_verify_nonce( $nonce, 'convert_newsletters_to_blocks' ) ) {
+			wp_die();
+		}
+
+		$builder = new MailPoet_to_Blocks_Converter_Builder();
+		$response = $builder->create_newsletter_post(68);
+		$response = json_encode( $response );
+		
+		header( "Content-Type: application/json" );
+		wp_send_json_success( $response );
+
+		exit;
 	}
 
 	/**
@@ -35,6 +78,8 @@ class MailPoet_to_Blocks_Converter_Admin {
 	 * Renders a simple page to display for the theme menu defined above.
 	 */
 	public function render_settings_page_content() {
+		// Enqueue scripts and styles.
+		$this->enqueue_scripts();
 		?>
 		<!-- Create a header in the default WordPress 'wrap' container -->
 		<div class="wrap">
@@ -43,7 +88,6 @@ class MailPoet_to_Blocks_Converter_Admin {
 			<?php
 			// Display any settings errors registered to the settings_error hook
 			settings_errors();
-
 			?>
 
 			<p>
@@ -52,24 +96,36 @@ class MailPoet_to_Blocks_Converter_Admin {
 			<p>
 				<?php esc_html_e( 'Please note that not all MailPoet content types are supported at this time.', 'mailpoet-to-blocks'); ?>
 			</p>
-			<p>
-				<?php
-				$builder = new MailPoet_to_Blocks_Converter_Builder();
-				$newsletter_count = $builder->get_mailpoet_newsletters_count();
-				printf( __( 'You have <strong>%d</strong> newsletters in MailPoet, ready to convert.', 'mailpoet-to-blocks' ), $newsletter_count  );
-				?>
-			</p>
 
 			<form method="post" action="options.php">
 				<?php
-
 				settings_fields( 'mailpoet_to_blocks_general_settings' );
 				do_settings_sections( 'mailpoet_to_blocks_general_settings' );
 
-				submit_button();
-
+				submit_button( __( 'Save Settings', 'mailpoet-to-blocks' ) );
 				?>
 			</form>
+
+			<div>
+
+				<hr>
+				
+				<h2><?php esc_attr_e( 'Convert Newsletters', 'mailpoet-to-blocks' ); ?></h2>
+
+				<p>
+					<?php
+					$builder = new MailPoet_to_Blocks_Converter_Builder();
+					$newsletter_count = $builder->get_mailpoet_newsletters_count();
+					printf( __( 'You have <strong>%d</strong> newsletters in MailPoet, ready to convert.', 'mailpoet-to-blocks' ), $newsletter_count  );
+					?>
+				</p>
+
+				<p>
+					<a class="button button-primary" id="convert-newsletters" href="javascript:void(0);"><?php esc_html_e( 'Convert Newsletters', 'mailpoet-to-blocks' ); ?></a>
+				</p>
+				<div id="convert-newsletters-log"></div>
+			
+			</div>
 			<?php
 			$builder->display_results();
 			?>
