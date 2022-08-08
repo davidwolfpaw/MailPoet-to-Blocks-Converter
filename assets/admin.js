@@ -42,13 +42,14 @@ window.MailPoet_to_Blocks_Admin = window.MailPoet_to_Blocks_Admin || {};
       dataType: "json",
       data: data,
     }).done(function (response) {
-      // bail early if not successful.
+      // exit early if there is a convert error
       if (true !== response.success) {
         alert(app.l10n.convert_error);
         return false;
       }
-      // append response to log.
-      app.$.convert_newsletters_log.html(response);
+      console.log(response);
+      // change log for completion response
+      app.$.convert_newsletters_log.html("<p>" + response.data + "</p>");
     });
   };
 

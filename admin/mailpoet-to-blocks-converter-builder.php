@@ -370,8 +370,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 		);
 
 		// Insert the post into the database
-		// wp_insert_post( $post_array );
-		return $post_array;
+		wp_insert_post( $post_array );
 
 	}
 
