@@ -158,12 +158,36 @@ class MailPoet_to_Blocks_Converter_Builder {
 	 * @return string $html
 	 */
 	public function create_block_text( $block ) {
-		$html = $block['text'];
+		$text = $block['text'];
+
+		// Removes line breaks and empty paragraph tags
+		// Also removes WP block comments that are usually out of place for what we need
+		$strip_text = array(
+			'\n',
+			'<!-- wp:paragraph -->',
+			'<!-- /wp:paragraph -->',
+			'<!-- wp:image -->',
+			'<!-- /wp:image -->',
+			'<!-- wp:quote -->',
+			'<!-- /wp:quote -->',
+			'<p></p>',
+			'<p> </p>',
+			'<p style="text-align: left"></p>',
+		);
+		$text = str_replace( $strip_text, '', $text );
+
+		// Re-add paragraph and quote WP comments along with linebreaks
+		$text = str_replace( '<p', "\r\n<!-- wp:paragraph -->\r\n<p", $text );
+		$text = str_replace( '</p>', "</p>\r\n<!-- /wp:paragraph -->\r\n", $text );
+		$text = str_replace( '<!-- wp:paragraph --></p>', '</p>', $text );
+		$text = str_replace( '<blockquote', "\r\n<!-- wp:quote -->\r\n<blockquote", $text );
+		$text = str_replace( '</blockquote>', "</blockquote>\r\n<!-- /wp:quote -->\r\n", $text );
+
+		$html = '';
+		$html .= $text;
 
 		global $build_content;
 		$build_content .= $html;
-
-		return $html;
 	}
 
 	/**
@@ -177,6 +201,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 		$image_src       = isset( $block['src'] ) ? $block['src'] : '';
 		$image_alt       = isset( $block['alt'] ) ? $block['alt'] : '';
 		$image_fullWidth = isset( $block['fullWidth'] ) ? $block['fullWidth'] : false;
+		// TODO: inserting width into <img> tag breaks the block, so we're ignoring for now
 		$image_width     = isset( $block['width'] ) ? $block['width'] : '';
 		// height is not set by MailPoet, so we'll be using auto for height value
 		$image_height    = isset( $block['height'] ) ? $block['height'] : '';
@@ -185,42 +210,58 @@ class MailPoet_to_Blocks_Converter_Builder {
 		$html = '';
 		
 		if ( ! empty ( $image_link ) && false === $image_fullWidth ) {
+			$html .= "\r\n";
 			$html .= '<!-- wp:image {"align":"' . $image_align . '","width":' . $image_width . ',"height":' . $image_height . ',"linkDestination":"custom"} -->';
+			$html .= "\r\n";
 			$html .= '<figure class="wp-block-image align' . $image_align . '">';
 			$html .= '<a href="' . $image_link . '">';
-			$html .= '<img src="' . $image_src . '" alt="' . $image_alt . '" width="' . $image_width . '"/>';
+			// $html .= '<img src="' . $image_src . '" alt="' . $image_alt . '" width="' . $image_width . '"/>';
+			$html .= '<img src="' . $image_src . '" alt="' . $image_alt . '" />';
 			$html .= '</a>';
 			$html .= '</figure>';
+			$html .= "\r\n";
 			$html .= '<!-- /wp:image -->';
+			$html .= "\r\n";
 		}
 		if ( empty ( $image_link ) && true === $image_fullWidth ) {
+			$html .= "\r\n";
 			$html .= '<!-- wp:image {"align":"full","width":' . $image_width . ',"height":' . $image_height . ',"linkDestination":"none"} -->';
+			$html .= "\r\n";
 			$html .= '<figure class="wp-block-image alignfull">';
 			$html .= '<img src="' . $image_src . '" alt="' . $image_alt . '" width="' . $image_width . '"/>';
 			$html .= '</figure>';
+			$html .= "\r\n";
 			$html .= '<!-- /wp:image -->';
+			$html .= "\r\n";
 		}
 		if ( ! empty ( $image_link ) && true === $image_fullWidth ) {
+			$html .= "\r\n";
 			$html .= '<!-- wp:image {"align":"full","width":' . $image_width . ',"height":' . $image_height . ',"linkDestination":"custom"} -->';
+			$html .= "\r\n";
 			$html .= '<figure class="wp-block-image alignfull">';
 			$html .= '<a href="' . $image_link . '">';
 			$html .= '<img src="' . $image_src . '" alt="' . $image_alt . '" width="' . $image_width . '"/>';
 			$html .= '</a>';
 			$html .= '</figure>';
+			$html .= "\r\n";
 			$html .= '<!-- /wp:image -->';
+			$html .= "\r\n";
 		}
 		if ( empty ( $image_link ) && false === $image_fullWidth ) {
+			$html .= "\r\n";
 			$html .= '<!-- wp:image {"align":"' . $image_align . '","width":' . $image_width . ',"height":' . $image_height . ',"linkDestination":"none"} -->';
+			$html .= "\r\n";
 			$html .= '<figure class="wp-block-image align' . $image_align . '">';
-			$html .= '<img src="' . $image_src . '" alt="' . $image_alt . '" width="' . $image_width . '"/>';
+			// $html .= '<img src="' . $image_src . '" alt="' . $image_alt . '" width="' . $image_width . '"/>';
+			$html .= '<img src="' . $image_src . '" alt="' . $image_alt . '" />';
 			$html .= '</figure>';
+			$html .= "\r\n";
 			$html .= '<!-- /wp:image -->';
+			$html .= "\r\n";
 		}
 
 		global $build_content;
 		$build_content .= $html;
-
-		return $html;
 	}
 
 	/**
@@ -233,14 +274,16 @@ class MailPoet_to_Blocks_Converter_Builder {
 		$spacer_height = isset( $block['styles']['block']['height'] ) ? $block['styles']['block']['height'] : '30px';
 
 		$html = '';
+		$html .= "\r\n";
 		$html .= '<!-- wp:spacer {"height":"' . $spacer_height . '"} -->';
+		$html .= "\r\n";
 		$html .= '<div style="height:' . $spacer_height . '" aria-hidden="true" class="wp-block-spacer"></div>';
+		$html .= "\r\n";
 		$html .= '<!-- /wp:spacer -->';
+		$html .= "\r\n";
 
 		global $build_content;
 		$build_content .= $html;
-
-		return $html;
 	}
 
 	/**
@@ -256,19 +299,25 @@ class MailPoet_to_Blocks_Converter_Builder {
 		$html = '';
 		// only checking for dotted or not style to match block options
 		if ( isset( $block['styles']['block']['borderStyle'] ) && 'dotted' === $block['styles']['block']['borderStyle'] ) {
+			$html .= "\r\n";
 			$html .= '<!-- wp:separator {"style":{"color":{"background":"' . $divider_backgroundColor . '"}},"className":"is-style-dots"} -->';
+			$html .= "\r\n";
 			$html .= '<hr class="wp-block-separator has-text-color has-alpha-channel-opacity has-background is-style-dots" style="background-color:' . $divider_backgroundColor . ';color:' . $divider_backgroundColor . '"/>';
+			$html .= "\r\n";
 			$html .= '<!-- /wp:separator -->';
+			$html .= "\r\n";
 		} else {
+			$html .= "\r\n";
 			$html .= '<!-- wp:separator {"opacity":"css"}, {"style":{"color":{"background":"' . $divider_backgroundColor . '"}} -->';
+			$html .= "\r\n";
 			$html .= '<hr class="wp-block-separator has-css-opacity style="background-color:' . $divider_backgroundColor . ';color:' . $divider_backgroundColor . '"/>';
+			$html .= "\r\n";
 			$html .= '<!-- /wp:separator -->';
+			$html .= "\r\n";
 		}
 
 		global $build_content;
 		$build_content .= $html;
-		
-		return $html;
 	}
 
 	/**
@@ -288,8 +337,6 @@ class MailPoet_to_Blocks_Converter_Builder {
 
 		global $build_content;
 		$build_content .= $html;
-
-		return $html;
 	}
 
 	/**
@@ -371,6 +418,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 
 		// Insert the post into the database
 		wp_insert_post( $post_array );
+		// return $post_array;
 
 	}
 
