@@ -127,9 +127,6 @@ class MailPoet_to_Blocks_Converter_Admin {
 				<div id="convert-newsletters-log"></div>
 			
 			</div>
-			<?php
-			$builder->display_results();
-			?>
 
 		</div><!-- /.wrap -->
 		<?php

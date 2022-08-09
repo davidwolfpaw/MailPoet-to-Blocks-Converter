@@ -16,19 +16,6 @@ class MailPoet_to_Blocks_Converter_Builder {
 	}
 
 	/**
-	 * A test function to show me some output for debugging
-	 *
-	 * @return void
-	 */
-	public function display_results() {
-		global $build_content;
-		$results = '';
-		// $results = $this->create_newsletter_post(3);
-		// $results = $this->get_mailpoet_newsletters_ids();
-		// var_dump($results);
-	}
-
-	/**
 	 * Confirm that the MailPoet newsletters table exists
 	 * 
 	 * TODO: error handling on table not existing
@@ -258,7 +245,8 @@ class MailPoet_to_Blocks_Converter_Builder {
 			$html .= '<!-- wp:image {"align":"full","width":' . $image_width . ',"height":' . $image_height . ',"linkDestination":"none"} -->';
 			$html .= "\r\n";
 			$html .= '<figure class="wp-block-image alignfull">';
-			$html .= '<img src="' . $image_src . '" alt="' . $image_alt . '" width="' . $image_width . '"/>';
+			// $html .= '<img src="' . $image_src . '" alt="' . $image_alt . '" width="' . $image_width . '"/>';
+			$html .= '<img src="' . $image_src . '" alt="' . $image_alt . '" />';
 			$html .= '</figure>';
 			$html .= "\r\n";
 			$html .= '<!-- /wp:image -->';
@@ -270,7 +258,8 @@ class MailPoet_to_Blocks_Converter_Builder {
 			$html .= "\r\n";
 			$html .= '<figure class="wp-block-image alignfull">';
 			$html .= '<a href="' . $image_link . '">';
-			$html .= '<img src="' . $image_src . '" alt="' . $image_alt . '" width="' . $image_width . '"/>';
+			// $html .= '<img src="' . $image_src . '" alt="' . $image_alt . '" width="' . $image_width . '"/>';
+			$html .= '<img src="' . $image_src . '" alt="' . $image_alt . '" />';
 			$html .= '</a>';
 			$html .= '</figure>';
 			$html .= "\r\n";
@@ -358,6 +347,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 	 */
 	public function create_block_footer( $block ) {
 		$html = $block['text'];
+		// Currently none of this is getting used
 		$footer_backgroundColor = isset( $block['styles']['block']['backgroundColor'] ) ? $block['styles']['block']['backgroundColor'] : 'transparent';
 		$footer_fontColor       = isset( $block['styles']['text']['fontColor'] ) ? $block['styles']['text']['fontColor'] : 'inherit';
 		$footer_fontSize        = isset( $block['styles']['text']['fontSize'] ) ? $block['styles']['text']['fontSize'] : 'inherit';
@@ -428,17 +418,20 @@ class MailPoet_to_Blocks_Converter_Builder {
 
 		$newsletter = $this->get_single_newsletter( $post_id );
 
+		// Ensure that we're actually working with a newsletter
 		if ( null == $newsletter->id || 0 === $post_id ) {
 			return 'No newsletter ID given.';
 			exit;
 		}
 
+		// Modify newsletter details for insertion
 		$newsletter_post_type = $this->get_newsletter_post_type();
 		$newsletter_content   = $this->get_newsletter_body( $newsletter->id );
 		$newsletter_status    = $this->get_newsletter_status( $newsletter->status );
 		$newsletter_author    = $this->get_single_newsletter_author( $newsletter->sender_address );
 		$newsletter_type      = $newsletter->type;
 
+		// Only insert standard type newsletters into new posts
 		if ( 'standard' !== $newsletter_type ) {
 			return;
 		}
@@ -476,6 +469,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 		// loop through all newsletters by ID to create a post
 		foreach ( $ids as $id ) {
 			$this->create_newsletter_post( $id );
+			// wipes newslettr content global
 			$build_content = '';
 		}
 	}
