@@ -23,8 +23,8 @@ class MailPoet_to_Blocks_Converter_Builder {
 	public function display_results() {
 		global $build_content;
 		$results = '';
-		// $results = $this->create_newsletter_post(63);
-		// $results = $this->get_single_newsletter(63);
+		// $results = $this->create_newsletter_post(3);
+		// $results = $this->get_mailpoet_newsletters_ids();
 		// var_dump($results);
 	}
 
@@ -62,6 +62,30 @@ class MailPoet_to_Blocks_Converter_Builder {
 	}
 
 	/**
+	 * Get all IDs of newsletters from the database
+	 *
+	 * @return array $ids array of all IDs in database
+	 */
+	public function get_mailpoet_newsletters_ids() {
+		global $wpdb;
+		if ( true === $this->check_mailpoet_newsletters_table() ) {
+			$ids = $wpdb->get_results( 
+				$wpdb->prepare(
+					"SELECT id FROM {$wpdb->prefix}mailpoet_newsletters ORDER BY id"
+				) 
+			);
+
+			$id_array = array();
+
+			foreach ( $ids as $id => $key ) {
+				$id_array[] = $key->id;
+			}
+
+			return $id_array;
+		}
+	}
+
+	/**
 	 * Pull a single newsletter from the database
 	 *
 	 * @param integer $newsletter_id a specific newsletter to pull
@@ -85,6 +109,9 @@ class MailPoet_to_Blocks_Converter_Builder {
 	public function get_newsletter_blocks( int $post_id = 0 ) {
 		$newsletter = $this->get_single_newsletter( $post_id );
 		$newsletter_body = json_decode( $newsletter->body, true );
+		if ( empty ( $newsletter_body ) ) {
+			return;
+		}
 		$newsletter_blocks = $newsletter_body['content'];
 		return $newsletter_blocks;
 	}
@@ -96,7 +123,10 @@ class MailPoet_to_Blocks_Converter_Builder {
 	 */
 	public function get_newsletter_body( int $post_id = 0 ) {
 		$newsletter_blocks = $this->get_newsletter_blocks( $post_id );
-		$newsletter_body = $this->newsletter_blocks_loop( $newsletter_blocks );
+		if ( !isset ( $newsletter_blocks ) || null === $newsletter_blocks ) {
+			return;
+		}
+		$newsletter_body = array ( $this->newsletter_blocks_loop( $newsletter_blocks ) );
 		return $newsletter_body;
 	}
 
@@ -398,10 +428,20 @@ class MailPoet_to_Blocks_Converter_Builder {
 
 		$newsletter = $this->get_single_newsletter( $post_id );
 
+		if ( null == $newsletter->id || 0 === $post_id ) {
+			return 'No newsletter ID given.';
+			exit;
+		}
+
 		$newsletter_post_type = $this->get_newsletter_post_type();
 		$newsletter_content   = $this->get_newsletter_body( $newsletter->id );
 		$newsletter_status    = $this->get_newsletter_status( $newsletter->status );
 		$newsletter_author    = $this->get_single_newsletter_author( $newsletter->sender_address );
+		$newsletter_type      = $newsletter->type;
+
+		if ( 'standard' !== $newsletter_type ) {
+			return;
+		}
 
 		// TODO: insert $post["id"] to track already inserted
 		$post_array = array(
@@ -418,8 +458,26 @@ class MailPoet_to_Blocks_Converter_Builder {
 
 		// Insert the post into the database
 		wp_insert_post( $post_array );
-		// return $post_array;
 
+	}
+
+	/**
+	 * Loops all newsletters to create posts
+	 *
+	 * @param integer $post_id the ID of the newsletter being inserted
+	 */
+	public function create_newsletter_posts() {
+		// Get the global of newsletter content to wipe it after insert
+		global $build_content;
+
+		// Get each newsletter by ID
+		$ids = $this->get_mailpoet_newsletters_ids();
+
+		// loop through all newsletters by ID to create a post
+		foreach ( $ids as $id ) {
+			$this->create_newsletter_post( $id );
+			$build_content = '';
+		}
 	}
 
 }

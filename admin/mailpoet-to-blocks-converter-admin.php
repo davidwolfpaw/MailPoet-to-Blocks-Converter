@@ -49,10 +49,8 @@ class MailPoet_to_Blocks_Converter_Admin {
 		}
 
 		$builder = new MailPoet_to_Blocks_Converter_Builder();
-		$builder->create_newsletter_post(67);
-		// $response = $builder->create_newsletter_post(67);
-		// $response = json_encode( $response );
-
+		// $builder->create_newsletter_post(67);		
+		$builder->create_newsletter_posts();
 		$response = __( 'Conversion Complete!', 'mailpoet-to-blocks' );
 		
 		header( "Content-Type: application/json" );
