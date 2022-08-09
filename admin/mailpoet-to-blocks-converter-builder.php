@@ -53,7 +53,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 		if ( true === $this->check_mailpoet_newsletters_table() ) {
 			$count = $wpdb->get_results( 
 				$wpdb->prepare(
-					"SELECT count(ID) as total FROM {$wpdb->prefix}mailpoet_newsletters"
+					"SELECT count(ID) as total FROM {$wpdb->prefix}mailpoet_newsletters WHERE type='standard'"
 				) 
 			);
 			$count = $count[0]->total;
