@@ -108,9 +108,7 @@ class MailPoet_to_Blocks_Converter_Admin {
 			</form>
 
 			<div>
-
 				<hr>
-				
 				<h2><?php esc_attr_e( 'Convert Newsletters', 'mailpoet-to-blocks' ); ?></h2>
 
 				<p>
@@ -125,7 +123,6 @@ class MailPoet_to_Blocks_Converter_Admin {
 					<a class="button button-primary" id="convert-newsletters" href="javascript:void(0);"><?php esc_html_e( 'Convert Newsletters', 'mailpoet-to-blocks' ); ?></a>
 				</p>
 				<div id="convert-newsletters-log"></div>
-			
 			</div>
 
 		</div><!-- /.wrap -->
@@ -156,6 +153,20 @@ class MailPoet_to_Blocks_Converter_Admin {
 				'label_for'    => 'convert_post_type',
 				'option_group' => 'mailpoet_to_blocks_settings',
 				'option_id'    => 'convert_post_type',
+			)
+		);
+
+		add_settings_field(
+			'insert_preheader',
+			__( 'Insert preheader text?', 'mailpoet-to-blocks' ),
+			array( $this, 'checkbox_input_callback' ),
+			'mailpoet_to_blocks_general_settings',
+			'general_settings_section',
+			array(
+				'label_for'          => 'insert_preheader',
+				'option_group'       => 'mailpoet_to_blocks_settings',
+				'option_id'          => 'insert_preheader',
+				'option_description' => __( 'Insert MailPoet preheader text as a paragraph at the top of block newsletters.', 'mailpoet-to-blocks' ),
 			)
 		);
 

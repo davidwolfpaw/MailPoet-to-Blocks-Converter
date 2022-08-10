@@ -203,6 +203,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 		$html = '';
 		$html .= $text;
 
+		// Add content to the build_content global
 		global $build_content;
 		$build_content .= $html;
 	}
@@ -279,6 +280,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 			$html .= "\r\n";
 		}
 
+		// Add content to the build_content global
 		global $build_content;
 		$build_content .= $html;
 	}
@@ -301,6 +303,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 		$html .= '<!-- /wp:spacer -->';
 		$html .= "\r\n";
 
+		// Add content to the build_content global
 		global $build_content;
 		$build_content .= $html;
 	}
@@ -335,6 +338,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 			$html .= "\r\n";
 		}
 
+		// Add content to the build_content global
 		global $build_content;
 		$build_content .= $html;
 	}
@@ -355,6 +359,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 		$footer_linkColor       = isset( $block['styles']['link']['fontColor'] ) ? $block['styles']['link']['fontColor'] : 'inherit';
 		$footer_textDecoration  = isset( $block['styles']['link']['textDecoration'] ) ? $block['styles']['link']['textDecoration'] : 'inherit';
 
+		// Add content to the build_content global
 		global $build_content;
 		$build_content .= $html;
 	}
@@ -408,6 +413,27 @@ class MailPoet_to_Blocks_Converter_Builder {
 	}
 
 	/**
+	 * Inserts newsletter preheader from MailPoet as a paragraph at the top of the newsletter
+	 *
+	 * @param string $preheader the text of the preheader
+	 */
+	public function insert_newsletter_preheader( string $preheader = '' ) {
+
+		// exit early if there is no preheader text
+		if ( null === $preheader ) {
+			return;
+		}
+
+		$html = "\r\n<!-- wp:paragraph -->\r\n<p>";
+		$html .= $preheader;
+		$html .= "</p>\r\n<!-- /wp:paragraph -->\r\n";
+
+		// Add content to the build_content global
+		global $build_content;
+		$build_content .= $html;
+	}
+
+	/**
 	 * Creates a post from newsletter data and inserts it into the WP database
 	 *
 	 * @param integer $post_id the ID of the newsletter being inserted
@@ -426,6 +452,7 @@ class MailPoet_to_Blocks_Converter_Builder {
 
 		// Modify newsletter details for insertion
 		$newsletter_post_type = $this->get_newsletter_post_type();
+		$newsletter_preheader = $this->insert_newsletter_preheader( $newsletter->preheader );
 		$newsletter_content   = $this->get_newsletter_body( $newsletter->id );
 		$newsletter_status    = $this->get_newsletter_status( $newsletter->status );
 		$newsletter_author    = $this->get_single_newsletter_author( $newsletter->sender_address );
