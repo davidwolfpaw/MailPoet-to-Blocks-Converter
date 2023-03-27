@@ -9,8 +9,8 @@ Currently this plugin will convert all standard MailPoet newsleters into a post 
 Currently only text, image, spacer, divider, and footer block types will be processed.
 
 ## ToDos
-- [x] Batch convert newsletters
-- [x] Pull all newsletter data in one request to process
-- [x] Insert newsletter preheaders into top of post
+- [X] Batch convert newsletters
+- [X] Pull all newsletter data in one request to process
+- [X] Insert newsletter preheaders into top of post
 - [ ] Handle additional MailPoet content block types
 - [ ] Handle MailPoet columns
